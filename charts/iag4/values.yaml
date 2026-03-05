@@ -160,7 +160,6 @@ livenessProbe:
   timeoutSeconds: 5
   failureThreshold: 3
   successThreshold: 1
-  path: "/api/v2.0/poll"
 
 # The readiness probe used to determine if the container is ready to accept requests. If the
 # readiness probe fails, the endpoints controller removes the pod’s IP address from the
@@ -168,7 +167,7 @@ livenessProbe:
 # initial delay is failure. If a container does not provide a readiness probe, the default
 # state is success. These are suggested values.
 readinessProbe:
-  readinessProbe: false
+  enabled: false
   periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 3
