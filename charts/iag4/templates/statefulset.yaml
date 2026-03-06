@@ -207,10 +207,11 @@ spec:
         {{- if .Values.livenessProbe.enabled }}
         livenessProbe:
           failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
-          httpGet:
-            path: {{ .Values.livenessProbe.path }}
-            port: {{ .Values.applicationPort }}
-            scheme: {{ ternary "HTTPS" "HTTP" .Values.useTLS }}
+          exec:
+            command:
+              - sh
+              - -c
+              - 'test $(pgrep -f automation-gateway | wc -l) -ge 2'
           periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
           successThreshold: {{ .Values.livenessProbe.successThreshold }}
           timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}

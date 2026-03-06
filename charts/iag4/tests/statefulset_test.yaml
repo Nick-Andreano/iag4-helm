@@ -285,28 +285,44 @@ tests:
     set:
       statefulset.enabled: true
       serviceAccount.name: "test-sa"
-      applicationPort: 8080
-      useTLS: false
       livenessProbe:
         enabled: true
         periodSeconds: 20
         timeoutSeconds: 10
         failureThreshold: 5
         successThreshold: 1
-        path: "/health"
       applicationSettings:
         enabled: true
         env: {}
     asserts:
       - equal:
-          path: spec.template.spec.containers[0].livenessProbe.httpGet.scheme
-          value: "HTTP"
+          path: spec.template.spec.containers[0].livenessProbe.exec.command
+          value:
+            - sh
+            - -c
+            - 'test $(pgrep -f automation-gateway | wc -l) -ge 2'
       - equal:
           path: spec.template.spec.containers[0].livenessProbe.periodSeconds
           value: 20
       - equal:
           path: spec.template.spec.containers[0].livenessProbe.failureThreshold
           value: 5
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet
+
+  # Test 12b: Test liveness probe is not created when disabled
+  - it: should not configure liveness probe when disabled
+    set:
+      statefulset.enabled: true
+      serviceAccount.name: "test-sa"
+      livenessProbe:
+        enabled: false
+      applicationSettings:
+        enabled: true
+        env: {}
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
 
   # Test 13: Test readiness probe
   - it: should configure readiness probe when enabled
