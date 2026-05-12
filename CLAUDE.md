@@ -19,7 +19,6 @@ iag4-helm/
 ├── charts/iag4/
 │   ├── Chart.yaml                  # name: iag, version: 1.0.4, appVersion: 4.3.4
 │   ├── values.yaml                 # Full defaults with inline docs
-│   ├── values-aws-eks-NickA.yaml   # Personal AWS EKS test deployment values
 │   ├── templates/
 │   │   ├── _helpers.tpl            # iag.fullname, iag.labels, iag.selectorLabels, iag.annotations
 │   │   ├── statefulset.yaml        # Core workload + init container (SSH key permissions)
