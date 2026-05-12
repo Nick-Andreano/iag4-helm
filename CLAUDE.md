@@ -83,7 +83,8 @@ All map to `automation_gateway_*` environment variables in the StatefulSet.
 
 | Toggle | Default | Env var set |
 |--------|---------|-------------|
-| `ansibleEnabled` | `true` | `automation_gateway_ansible_enabled`, also `ansible_venv_enabled` (tied together) |
+| `ansibleEnabled` | `true` | `automation_gateway_ansible_enabled` |
+| `ansibleVenvEnabled` | `true` | `automation_gateway_ansible_venv_enabled` (independent of `ansibleEnabled`) |
 | `httpRequestsEnabled` | `true` | `automation_gateway_http_requests_enabled` |
 | `netconfEnabled` | `true` | `automation_gateway_netconf_enabled` |
 | `netmikoEnabled` | `true` | `automation_gateway_netmiko_enabled` |
@@ -107,7 +108,7 @@ These are hardcoded in the statefulset template:
 | `automation_gateway_data_file` | `sqlite:////var/lib/automation-gateway/automation-gateway.db` |
 | `automation_gateway_audit_db_file` | `sqlite:////var/lib/automation-gateway/automation-gateway_audit.db` |
 | `automation_gateway_exec_history_db_file` | `sqlite:////var/lib/automation-gateway/automation-gateway_exec_history.db` |
-| `automation_gateway_bind_address` | `status.podIP` (downward API) |
+| `automation_gateway_bind_address` | `status.podIP` (downward API) unless `applicationSettings.bindAddress` is set |
 | `automation_gateway_terraform_enabled` | `"false"` (no values toggle) |
 
 SQLite DB paths are fixed by the IAG application and must not be changed.
@@ -219,16 +220,6 @@ helm unittest charts/iag4 --strict
 ```
 
 ## Known Bugs & Gotchas
-
-**`readinessProbe` key typo in `tests/test-values.yaml`** — line uses `readinessProbe: false` (nested under `readinessProbe:`) instead of `enabled: false`. The template checks `.Values.readinessProbe.enabled`, so the readiness probe is silently never applied when using test-values.yaml as a base. The main `values.yaml` is correct (`enabled: false`).
-
-**`containerPort` uses `service.port` (443) not `applicationPort` (8443)** — the statefulset template sets `containerPort: {{ .Values.service.port }}`. IAG actually listens on `applicationPort` (8443). Kubernetes treats `containerPort` as informational so this doesn't break routing, but it's misleading.
-
-**HV TLS volume mount has a trailing quote typo** — in the statefulset template, the `ca.crt` mount path is `"/etc/ssl/hv/ca.crt"` with a literal trailing quote in the string, making the actual mountPath `"/etc/ssl/hv/ca.crt"` (including the quote character). This will cause the Vault CA bundle path to be wrong when `hvTLS: true`.
-
-**`applicationSettings.bindAddress` has no effect** — the field exists in example values files but is not referenced anywhere in the statefulset template. Bind address is always `status.podIP` via the downward API and cannot be overridden through values.
-
-**`automation_gateway_ansible_venv_enabled` is tied to `ansibleEnabled`** — there is no separate toggle for Ansible venvs. Both `automation_gateway_ansible_enabled` and `automation_gateway_ansible_venv_enabled` are set from `applicationSettings.ansibleEnabled`.
 
 **`automation_gateway_terraform_enabled` is hardcoded `false`** — no values.yaml key controls this. Cannot be enabled via Helm.
 
