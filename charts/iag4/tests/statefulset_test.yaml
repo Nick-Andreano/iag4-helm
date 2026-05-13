@@ -679,6 +679,22 @@ tests:
           path: spec.template.spec.containers[0].env[?(@.name == "automation_gateway_ansible_venv_enabled")].value
           value: "false"
 
+  # Test: containerPort matches applicationPort, not service.port
+  - it: should set containerPort to applicationPort value
+    set:
+      statefulset.enabled: true
+      serviceAccount.name: "test-sa"
+      applicationPort: 9000
+      service:
+        port: 443
+      applicationSettings:
+        enabled: true
+        env: {}
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 9000
+
   - it: should set the expected environment variables with LDAP is disabledset
     set:
       statefulset:

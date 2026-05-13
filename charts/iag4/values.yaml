@@ -212,7 +212,7 @@ applicationSettings:
   enabled: true
   # -- Enables the Ansible feature set in IAG.
   ansibleEnabled: true
-  # -- Enables Ansible virtual environments. Requires ansibleEnabled: true.
+  # -- Enables Ansible virtual environments. Independent of ansibleEnabled.
   ansibleVenvEnabled: true
   # -- Enables the HTTP request feature set in IAG.
   httpRequestsEnabled: true
