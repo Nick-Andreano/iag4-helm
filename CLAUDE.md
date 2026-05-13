@@ -202,6 +202,9 @@ Two optional objects:
 ## Common Helm Commands
 
 ```bash
+# Install the helm-unittest plugin (one-time)
+helm plugin install https://github.com/helm-unittest/helm-unittest
+
 # Lint
 helm lint charts/iag4
 
@@ -216,6 +219,9 @@ helm upgrade iag charts/iag4 -f my-values.yaml
 
 # Run unit tests
 helm unittest charts/iag4 --strict
+
+# Regenerate snapshots after intentional template changes
+helm unittest charts/iag4 --strict --update-snapshot
 ```
 
 ## Known Bugs & Gotchas
